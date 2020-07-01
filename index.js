@@ -4,12 +4,13 @@ const app = express()
 const cors = require('cors')
 const loginRouter = require(path.join(__dirname, 'router/login.js'))
 
-app.use(cors())
+
 
 app.use(express.json())
 app.use(express.urlencoded({
     extended: true
 }))
+app.use(cors())
 
 app.use('/api', loginRouter)
 
