@@ -1,8 +1,13 @@
+/*
+   登录注册接口
+*/
+
 const express = require('express')
 const path = require('path')
 const router = express.Router()
 const db = require(path.join(__dirname, '../common/db.js'))
 const utils = require('utility')
+const jwt = require('jsonwebtoken')
 
 //注册用户接口
 router.post('/reguser', async(req, res) => {
@@ -25,17 +30,38 @@ router.post('/reguser', async(req, res) => {
     }
 })
 
-router.get('/login', async(req, res) => {
+//用户登录接口
+router.post('/login', async(req, res) => {
+
+    req.body.password = utils.md5(req.body.password)
+    let param = req.body
 
 
-    let sql = 'select * from users'
+    let sql = 'select id from users where username=? and password=?'
 
-    let ret = await db.getData(sql, null)
+    let ret = await db.getData(sql, [param.username, param.password])
 
-    res.json({
-        status: 0,
-        data: ret
-    })
+    if (ret && ret.length > 0) {
+
+        // 生成登录成功状态的唯一标识token
+        let token = jwt.sign({
+            username: param.username,
+            id: ret[0].id
+        }, 'bigevent', {
+            expiresIn: '1h'
+        })
+        res.json({
+            status: 0,
+            message: '登录成功 !',
+            token: 'Bearer ' + token
+        })
+
+    } else {
+        res.json({
+            status: 1,
+            message: '登录失败 !'
+        })
+    }
 
 
 })
