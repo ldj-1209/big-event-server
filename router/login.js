@@ -48,7 +48,7 @@ router.post('/login', async(req, res) => {
             username: param.username,
             id: ret[0].id
         }, 'bigevent', {
-            expiresIn: '1h'
+            expiresIn: '10h'
         })
         res.json({
             status: 0,
